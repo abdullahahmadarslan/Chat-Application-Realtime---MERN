@@ -1,0 +1,181 @@
+/* css reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+}
+
+/* :root {
+  --navbarColor: #646cff;
+  --darkColor: black;
+  --lightColor: white;
+} */
+
+html {
+  font-size: 16px;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+}
+
+#root {
+  background-image: url('../public/bg.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* overflow: hidden; */
+
+
+}
+
+/* login */
+.custom-margin-left {
+  margin-left: 10px;
+}
+
+/* home */
+.main-home {
+  /* border: 2px solid red; */
+  height: 100%;
+  width: 100%;
+}
+
+.main-row {
+  height: 100%;
+  width: 100%;
+}
+
+/* left side */
+
+.left-top {
+  border-bottom: 1px solid white;
+  margin-bottom: 15px;
+  height: 10%;
+}
+
+.search-bar {
+  width: 85%;
+}
+
+.left-bottom {
+  width: 100%;
+  height: 80%;
+}
+
+.contact-list {
+  width: 100%;
+  margin-left: 5px;
+  display: visible;
+
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  height: 5rem;
+  margin-bottom: 10px;
+}
+
+
+.contact.active {
+  background-color: #2980b9;
+}
+
+.contact.not-active {
+  background-color: black;
+}
+
+.contact:hover {
+  background-color: #34495e;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.online-indicator {
+  position: absolute;
+  top: 0px;
+  /* Adjust this value as needed */
+  right: 5px;
+  /* Adjust this value as needed */
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* left bottom */
+.left-bottom {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* messages container */
+.chat-header {
+  border-bottom: 1px solid black;
+  height: 7.5%;
+}
+
+.chat-header input {
+  height: 2.5rem;
+  width: 50%;
+  margin-left: 5px;
+}
+
+.chat-body {
+  overflow-y: auto;
+  /* background-image: url('background.jpg'); */
+  /* Optional background image */
+  background-size: cover;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.message.sent {
+  justify-content: flex-end;
+}
+
+.message .text {
+  max-width: 60%;
+  padding: 10px;
+  border-radius: 15px;
+  position: relative;
+}
+
+.message.sent .text {
+  background-color: #dcf8c6;
+}
+
+.message.received .text {
+  background-color: wheat;
+}
+
+.timestamp {
+  display: block;
+  font-size: 0.75rem;
+  color: gray;
+  text-align: right;
+  margin-top: 5px;
+}
+
+.chat-footer input {
+  border-radius: 20px;
+  padding: 10px 15px;
+}
