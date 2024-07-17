@@ -40,8 +40,8 @@ const SignupPage = () => {
   return (
     <div className="d-flex vh-100 vw-100 justify-content-center align-items-center">
       <div
-        className="col-md-6 col-lg-3 p-5 shadow bg-body rounded-4 mt-5"
-        style={{ height: "87%" }}
+        className="col-md-6 col-lg-3 p-5 shadow bg-body rounded-4"
+        style={{ height: "auto" }}
       >
         <h2 className="text-center mb-4 border-bottom border-dark p-2">
           Sign Up
@@ -170,7 +170,10 @@ const SignupPage = () => {
             {!loading ? (
               <MdOutlineLogin style={{ fontSize: "30px", width: "50px" }} />
             ) : (
-              <div class="spinner-border text-muted" style={{ fontSize: "30px" }}></div>
+              <div
+                class="spinner-border text-muted"
+                style={{ fontSize: "30px" }}
+              ></div>
             )}
           </button>
         </form>
