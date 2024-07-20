@@ -63,18 +63,16 @@ export const Sidebar = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              marginLeft: "15px",
+              marginLeft: "5px",
+              marginBottom: "10px",
             }}
           >
             {!loading ? (
               <>
-                <CiLogout style={{ fontSize: "40px", fontWeight: "bold" }} />
+                <CiLogout style={{ fontSize: "40px" }} />
               </>
             ) : (
-              <div
-                className="spinner-border text-muted"
-                style={{ fontSize: "30px" }}
-              ></div>
+              <div className="spinner-border text-muted"></div>
             )}
           </button>
         </div>

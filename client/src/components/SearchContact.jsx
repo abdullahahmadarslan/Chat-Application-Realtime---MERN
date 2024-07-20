@@ -41,9 +41,10 @@ const SearchContact = () => {
       <div className="left-top d-flex align-items-center justify-content-center container-fluid">
         <form
           onSubmit={handleSubmit}
-          className="d-flex align-items-center justify-content-center"
+          className="d-flex align-items-center justify-content-center flex-column flex-sm-column flex-md-row flex-lg-row"
+          style={{ width: "100%" }}
         >
-          <div className="search-bar p-3">
+          <div className="search-bar p-3 container-fluid ">
             <input
               type="text"
               className="form-control"
@@ -52,6 +53,7 @@ const SearchContact = () => {
                 border: "none",
                 outline: "none",
                 boxShadow: "none",
+                width: "100%",
               }}
               onFocus={(e) => (e.target.style.boxShadow = "none")}
               onBlur={(e) => (e.target.style.boxShadow = "none")}
@@ -60,14 +62,13 @@ const SearchContact = () => {
             />
           </div>
           <button
-            className="btn btn-light btn-block search-btn-left"
-            style={{ height: "40px" }}
+            className="btn btn-light btn-block search-btn-left rounded-5"
+            style={{}}
             type="submit"
           >
             <FaSearch
               style={{
-                fontSize: "20px",
-                width: "20px",
+                fontSize: "19px",
               }}
             />
           </button>

@@ -82,5 +82,63 @@ const getMsgs = async (req, res, next) => {
   }
 };
 
+// delete a message
+const deleteMsg = async (req, res, next) => {
+  try {
+    const { messageId } = req.params;
+    const userId = req.user._id;
+
+    const message = await MsgModel.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    if (message.sender.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "Unauthorized action" });
+    }
+
+    message.isDeleted = true;
+    message.message = "Message deleted";
+
+    await message.save();
+
+    res.status(200).json({ message: "Message deleted successfully" });
+  } catch (err) {
+    console.error(`Server error while deleting message: ${err}`);
+    next({ errorDetails: "Internal Server Error While deleting message" });
+  }
+};
+
+// update a message
+const editMsg = async (req, res, next) => {
+  try {
+    const { messageId } = req.params;
+    const { message } = req.body;
+    const userId = req.user._id;
+
+    const msg = await MsgModel.findById(messageId);
+
+    if (!msg) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+    // console.log(msg.sender);
+    // console.log(userId);
+    if (msg.sender.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "Unauthorized action" });
+    }
+
+    msg.message = message;
+    msg.isEdited = true;
+
+    await msg.save();
+
+    res.status(200).json({ message: "Message edited successfully" });
+  } catch (err) {
+    console.error(`Server error while editing message: ${err}`);
+    next({ errorDetails: "Internal Server Error While editing message" });
+  }
+};
+
 // exporting
-module.exports = { sendMsg, getMsgs };
+module.exports = { sendMsg, getMsgs, deleteMsg, editMsg };

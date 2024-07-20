@@ -6,10 +6,14 @@ import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 import { useGetMessages } from "../hooks/useGetMessages";
 import { useListenNewMsgs } from "../hooks/useListenNewMsgs";
+import ChatLoader from "../skeletons/ChatLoader";
+import WelcomeScreen from "./WelcomeScreen";
+import { useDeleteMessage } from "../hooks/useDeleteMessage";
+import { useEditMessage } from "../hooks/useEditMessage";
 
-const MessagesLoader = () => {
-  return <div className="text-center">Loading messages...</div>;
-};
+// const MessagesLoader = () => {
+//   return <div className="text-center">Loading messages...</div>;
+// };
 
 export const MessagesContainer = () => {
   const [message, setMessage] = useState("");
@@ -17,6 +21,8 @@ export const MessagesContainer = () => {
   const { selectedContact, setSelectedContact, messages } = useAuth();
   const { getMessages, loadingMsgs } = useGetMessages();
   const lastMessageRef = useRef(null); // Reference to the last message
+  const { deleteMessage } = useDeleteMessage();
+  const { editMessage } = useEditMessage();
 
   // actively listening for new messages
   useListenNewMsgs();
@@ -60,6 +66,14 @@ export const MessagesContainer = () => {
     }
   };
 
+  //handling msg delete
+  const handleDeleteMessage = (messageId) => {
+    deleteMessage(messageId);
+  };
+  //handling msg update
+  const handleEditMessage = (messageId, newMessage) => {
+    editMessage(messageId, newMessage);
+  };
   return (
     <div
       className="col-9 p-0 d-flex flex-column"
@@ -68,47 +82,58 @@ export const MessagesContainer = () => {
       {selectedContact ? (
         <>
           {/* Header */}
-          <div className="chat-header bg-primary text-white p-2">
-            <strong>To:</strong>
-            <input
-              type="text"
-              placeholder="Send Message To..."
-              style={{
-                border: "none",
-                outline: "none",
-                boxShadow: "none",
-                borderRadius: "5px",
-                height: "auto",
-                padding: "3px",
-              }}
-              onFocus={(e) => (e.target.style.boxShadow = "none")}
-              onBlur={(e) => (e.target.style.boxShadow = "none")}
-              value={
-                selectedContact
-                  ? `${selectedContact.firstName} ${selectedContact.lastName}`
-                  : ""
-              }
-              onChange={() => {}}
-            />
+          <div
+            className="chat-header container-fluid bg-primary text-white p-2 d-flex align-items-center justify-content-center "
+            style={{ height: "7%" }}
+          >
+            {selectedContact && (
+              <>
+                <img
+                  src={selectedContact.profilePicture} // Assuming you have an avatarUrl field in selectedContact
+                  alt={`${selectedContact.firstName} ${selectedContact.lastName}`}
+                  className=" img-fluid rounded-circle me-2"
+                  style={{ height: "80%" }}
+                />
+                <span
+                  style={{
+                    fontWeight: "bolder",
+                    fontSize: "1.2rem",
+                    marginLeft: "0.5rem",
+                  }}
+                >{`${selectedContact.firstName} ${selectedContact.lastName}`}</span>
+              </>
+            )}
           </div>
+
           {/* Body */}
           <div
             className="chat-body flex-grow-1 p-3"
-            style={{ backgroundColor: "white", overflowY: "auto" }} // Added overflowY for scrolling
+            style={{
+              backgroundColor: "white",
+              overflowY: "auto",
+              height: "86%",
+            }} // Added overflowY for scrolling
           >
             {loadingMsgs ? (
-              <MessagesLoader />
+              <ChatLoader />
             ) : (
               <>
                 {messages.length > 0 ? (
                   messages.map((messagee) => (
-                    <ChatMessage key={messagee._id} messagee={messagee} />
+                    <ChatMessage
+                      key={messagee._id}
+                      messagee={messagee}
+                      onDelete={handleDeleteMessage}
+                      onEdit={handleEditMessage}
+                    />
                   ))
                 ) : (
                   <>
-                    <div className="text-center">No messages found</div>
                     <div className="text-center">
-                      Send A message to start Conversation
+                      <p class="h2">No messages found!</p>
+                    </div>
+                    <div className="text-center">
+                      Send a message to start Conversation
                     </div>
                   </>
                 )}
@@ -121,6 +146,7 @@ export const MessagesContainer = () => {
           <form
             className="chat-footer bg-light p-2 d-flex"
             onSubmit={handleSubmit}
+            style={{ height: "8%" }}
           >
             <input
               type="text"
@@ -146,17 +172,6 @@ export const MessagesContainer = () => {
       ) : (
         <WelcomeScreen />
       )}
-    </div>
-  );
-};
-
-const WelcomeScreen = () => {
-  return (
-    <div
-      className="chat-body flex-grow-1 p-3"
-      style={{ backgroundColor: "white" }}
-    >
-      <h1>Welcome!</h1>
     </div>
   );
 };

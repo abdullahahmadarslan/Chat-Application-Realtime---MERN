@@ -10,11 +10,12 @@ export const Contact = ({ contact }) => {
   return (
     <>
       <div
-        className={`contact ${
+        className={`container-fluid contact ${
           selectedContact && selectedContact?._id === contact?._id
             ? "active"
             : "not-active"
-        }`}
+        }
+        d-flex flex-column flex-sm-column flex-md-row flex-lg-row mb-4 h-auto`}
         onClick={() => {
           setSelectedContact(contact);
         }}
@@ -34,9 +35,11 @@ export const Contact = ({ contact }) => {
             }}
           ></div>
         </div>
-        <span>{`${contactsArray ? contact.firstName : ""} ${
-          contactsArray ? contact.lastName : ""
-        }`}</span>
+        <span className="ms-3">
+          {`${contactsArray ? contact.firstName : ""} ${
+            contactsArray ? contact.lastName : ""
+          }`}
+        </span>
       </div>
     </>
   );
