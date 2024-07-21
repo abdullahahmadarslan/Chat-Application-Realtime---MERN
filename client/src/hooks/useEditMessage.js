@@ -18,7 +18,7 @@ export const useEditMessage = () => {
           body: JSON.stringify({ message: newMessage }),
         }
       );
-      console.log(response);
+      // console.log(response);
 
       if (!response.ok) {
         throw new Error("Failed to edit message");

@@ -103,6 +103,12 @@ const deleteMsg = async (req, res, next) => {
 
     await message.save();
 
+    // Emit the messageDeleted
+    const receiverSocketId = getSocketId(message.receiver);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("messageDeleted", message);
+    }
+
     res.status(200).json({ message: "Message deleted successfully" });
   } catch (err) {
     console.error(`Server error while deleting message: ${err}`);
@@ -132,6 +138,12 @@ const editMsg = async (req, res, next) => {
     msg.isEdited = true;
 
     await msg.save();
+
+    // Emit the messageEdited event to the receiver
+    const receiverSocketId = getSocketId(msg.receiver);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("messageEdited", msg);
+    }
 
     res.status(200).json({ message: "Message edited successfully" });
   } catch (err) {

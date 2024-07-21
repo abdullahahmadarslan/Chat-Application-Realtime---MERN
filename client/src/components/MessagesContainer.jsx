@@ -130,7 +130,7 @@ export const MessagesContainer = () => {
                 ) : (
                   <>
                     <div className="text-center">
-                      <p class="h2">No messages found!</p>
+                      <p className="h2">No messages found!</p>
                     </div>
                     <div className="text-center">
                       Send a message to start Conversation

@@ -40,10 +40,6 @@ export const SocketProvider = ({ children }) => {
     // eslint-disable-next-line
   }, [userAuth]);
 
-  useEffect(() => {
-    console.log("Updated online users:", onlineUsers);
-  }, [onlineUsers]);
-
   return (
     <SocketContext.Provider
       value={{ socket, onlineUsers, setSocket, setOnlineUsers }}
