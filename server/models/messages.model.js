@@ -9,11 +9,13 @@ const MsgSchema = new Schema(
       ref: "Auth",
       required: true,
     },
-    receiver: {
-      type: Schema.Types.ObjectId,
-      ref: "Auth",
-      required: true,
-    },
+    receiver: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Auth",
+        required: true,
+      },
+    ],
     message: {
       type: String,
       required: true,

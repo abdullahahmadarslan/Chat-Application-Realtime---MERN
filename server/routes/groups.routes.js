@@ -3,14 +3,13 @@ const { Router } = express;
 const router = Router();
 
 // controllers
-const { getAllUsers, getFriends } = require("../controllers/users.controller");
+const { getGroupsForSidebar } = require("../controllers/groups.controller");
 
 // middleware
 const { ProtectRoute } = require("../middlewares/protectRoute.middleware");
 
 // routes
-router.get("/", ProtectRoute, getFriends);
-router.get("/allUsers", ProtectRoute, getAllUsers);
+router.get("/", ProtectRoute, getGroupsForSidebar);
 
 // exporting
 module.exports = router;

@@ -1,4 +1,3 @@
-const { profile } = require("console");
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -41,6 +40,7 @@ const authSchema = new Schema(
       type: String,
       required: true,
     },
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "Auth" }],
   },
   { timestamps: true }
 );

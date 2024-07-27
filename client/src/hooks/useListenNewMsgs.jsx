@@ -1,5 +1,3 @@
-// hooks/useListenNewMsgs.js
-
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useSocketContext } from "../context/SocketContext";

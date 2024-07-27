@@ -5,6 +5,7 @@ const router = Router();
 
 // controllers
 const {
+  createGroup,
   sendMsg,
   getMsgs,
   deleteMsg,
@@ -15,10 +16,15 @@ const {
 const { ProtectRoute } = require("../middlewares/protectRoute.middleware");
 
 // routes
-router.post("/sendMsg/:recipientId", ProtectRoute, sendMsg);
-router.get("/:recipientId", ProtectRoute, getMsgs);
+router.post("/sendMsg/:recipientIds", ProtectRoute, sendMsg);
+router.get("/:recipientIds", ProtectRoute, getMsgs);
 router.delete("/:messageId", ProtectRoute, deleteMsg);
 router.put("/:messageId", ProtectRoute, editMsg);
+
+// Group chat routes
+router.post("/group/createGroup", ProtectRoute, createGroup);
+router.post("/group/sndMsg/:recipientIds", ProtectRoute, sendMsg);
+router.get("/group/:recipientIds/messages", ProtectRoute, getMsgs);
 
 // exporting
 module.exports = router;

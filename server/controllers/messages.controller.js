@@ -1,47 +1,96 @@
 const MsgModel = require("../models/messages.model");
 const ConvModel = require("../models/conversations.model");
 const { io, getSocketId } = require("../socket/socket");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
-// sending message to another person from the current logged in user
+// Create a group chat
+const createGroup = async (req, res, next) => {
+  try {
+    const { groupName, participants } = req.body;
+
+    // generating profile picture of group
+    const apiUrl = `https://ui-avatars.com/api/?name=${groupName}&rounded=true`;
+
+    const newGroup = new ConvModel({
+      groupName,
+      participants,
+      isGroup: true,
+      profilePicture: apiUrl,
+    });
+    await newGroup.save();
+
+    res.status(201).json({
+      message: "Group created successfully",
+      newGroup,
+    });
+  } catch (err) {
+    console.error(`Server error while creating group: ${err} `);
+    next({ errorDetails: "Internal Server Error While creating group" });
+  }
+};
+
+// Send a message to a group or direct message
 const sendMsg = async (req, res, next) => {
   try {
     const { message } = req.body;
-    const { recipientId } = req.params;
+    const { recipientIds } = req.params;
     const senderId = req.user._id;
 
-    // find conversation between sender and recipient
-    let conversation = await ConvModel.findOne({
-      participants: { $all: [senderId, recipientId] },
+    // Split recipientIds into an array if it's a comma-separated string
+    const recipientArrayNew = recipientIds.split(",").map((id) => id.trim());
+
+    // Validate and convert to ObjectId
+    const objectIdArray = recipientArrayNew.map((id) => {
+      if (!ObjectId.isValid(id)) {
+        throw new Error(`Invalid ObjectId: ${id}`);
+      }
+      return new ObjectId(id);
     });
 
+    // Ensure senderId is not repeated in objectIdArray
+    const uniqueObjectIdArray = objectIdArray.filter(
+      (id) => !id.equals(senderId)
+    );
+    // Sort arrays for comparison
+    const sortedParticipants = [senderId, ...uniqueObjectIdArray].sort();
+
+    // Find conversation with exactly the mentioned IDs
+    let conversation = await ConvModel.findOne({
+      participants: {
+        $size: sortedParticipants.length,
+        $all: sortedParticipants,
+      },
+    });
+
+    // Create a new conversation if it does not exist
     if (!conversation) {
-      // create new conversation
       conversation = new ConvModel({
-        participants: [senderId, recipientId],
+        participants: sortedParticipants,
+        isGroup: recipientArrayNew.length > 1, // Determine if it is a group chat
       });
     }
 
-    // create new message
+    // Create a new message
     const newMessage = new MsgModel({
-      receiver: recipientId,
+      receiver: uniqueObjectIdArray, // Assuming the receiver field can store an array
       sender: senderId,
       message,
     });
+    console.log(newMessage);
 
     if (newMessage) {
-      // pushing the message reference id in the conversation document's messages array
+      // Push the message reference ID in the conversation document's messages array
       conversation.messages.push(newMessage._id);
-
-      // saving both the conversation and the message to the database
       await Promise.all([conversation.save(), newMessage.save()]);
 
-      // after storing the message to the database, we sent it to the receiver in real time too at the receiver's socket id
-      const receiverSocketId = getSocketId(recipientId);
-      // console.log("receiver's socket id: ", receiverSocketId);
-      if (receiverSocketId) {
-        // emitting the new message to the receiver's socket id
-        io.to(receiverSocketId).emit("newMessage", newMessage);
-      }
+      // Notify all participants
+      conversation.participants.forEach((participantId) => {
+        const receiverSocketId = getSocketId(participantId);
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
+      });
 
       res.status(201).json({
         message: "Message sent successfully",
@@ -49,36 +98,51 @@ const sendMsg = async (req, res, next) => {
       });
     }
   } catch (err) {
-    console.error(`server error while sending message: ${err} `);
-    const error = {
-      errorDetails: "Internal Server Error While sending message",
-    };
-    next(error);
+    console.error(`Server error while sending message: ${err}`);
+    next({ errorDetails: "Internal Server Error While sending message" });
   }
 };
-
 // getting all messages for a specific conversation between the logged in user and a recipient
 const getMsgs = async (req, res, next) => {
   try {
-    const { recipientId } = req.params;
+    const { recipientIds } = req.params; //always a string is returned
     const senderId = req.user._id;
 
-    // finding the conversation between sender and recipient
+    // Split recipientIds into an array if it's a comma-separated string
+    const recipientArrayNew = recipientIds.split(",").map((id) => id.trim());
+
+    // Validate and convert to ObjectId
+    const objectIdArray = recipientArrayNew.map((id) => {
+      if (!ObjectId.isValid(id)) {
+        throw new Error(`Invalid ObjectId: ${id}`);
+      }
+      return new ObjectId(id);
+    });
+
+    // Ensure senderId is not repeated in objectIdArray
+    const uniqueObjectIdArray = objectIdArray.filter(
+      (id) => !id.equals(senderId)
+    );
+    // Sort arrays for comparison
+    const sortedParticipants = [senderId, ...uniqueObjectIdArray].sort();
+
+    // Find the conversation with exactly the mentioned IDs
     const conversation = await ConvModel.findOne({
-      participants: { $all: [senderId, recipientId] },
+      participants: {
+        $size: sortedParticipants.length,
+        $all: sortedParticipants,
+      },
     }).populate("messages");
 
     if (!conversation) {
       return res.status(404).json({ message: "No conversation found" });
     }
-    // returning the messages array of objects of the conversation
+
+    // Return the messages array of objects from the conversation
     return res.status(200).json(conversation.messages);
   } catch (err) {
-    console.error(`server error while getting messages: ${err} `);
-    const error = {
-      errorDetails: "Internal Server Error While  getting messages",
-    };
-    next(error);
+    console.error(`Server error while getting messages: ${err}`);
+    next({ errorDetails: "Internal Server Error While getting messages" });
   }
 };
 
@@ -153,4 +217,4 @@ const editMsg = async (req, res, next) => {
 };
 
 // exporting
-module.exports = { sendMsg, getMsgs, deleteMsg, editMsg };
+module.exports = { createGroup, sendMsg, getMsgs, deleteMsg, editMsg };

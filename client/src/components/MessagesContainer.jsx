@@ -18,7 +18,8 @@ import { useEditMessage } from "../hooks/useEditMessage";
 export const MessagesContainer = () => {
   const [message, setMessage] = useState("");
   const { loading, sendMsg } = useSendMsg();
-  const { selectedContact, setSelectedContact, messages } = useAuth();
+  const { selectedContact, setSelectedContact, messages, selectedGroup } =
+    useAuth();
   const { getMessages, loadingMsgs } = useGetMessages();
   const lastMessageRef = useRef(null); // Reference to the last message
   const { deleteMessage } = useDeleteMessage();
@@ -39,7 +40,7 @@ export const MessagesContainer = () => {
     fetchMessages();
     // console.log(selectedContact);
     // eslint-disable-next-line
-  }, [selectedContact]);
+  }, [selectedContact, selectedGroup]);
 
   // Scroll to the last message when messages are updated
   useEffect(() => {
@@ -79,28 +80,41 @@ export const MessagesContainer = () => {
       className="col-9 p-0 d-flex flex-column"
       style={{ height: "100%", width: "80%" }}
     >
-      {selectedContact ? (
+      {selectedContact || selectedGroup ? (
         <>
           {/* Header */}
           <div
             className="chat-header container-fluid bg-primary text-white p-2 d-flex align-items-center justify-content-center "
             style={{ height: "7%" }}
           >
-            {selectedContact && (
+            {(selectedContact || selectedGroup) && (
               <>
                 <img
-                  src={selectedContact.profilePicture} // Assuming you have an avatarUrl field in selectedContact
-                  alt={`${selectedContact.firstName} ${selectedContact.lastName}`}
-                  className=" img-fluid rounded-circle me-2"
+                  src={
+                    selectedContact
+                      ? selectedContact.profilePicture
+                      : selectedGroup.profilePicture
+                  }
+                  alt={
+                    selectedContact
+                      ? `${selectedContact.firstName} ${selectedContact.lastName}`
+                      : selectedGroup.groupName
+                  }
+                  className="img-fluid rounded-circle me-2"
                   style={{ height: "80%" }}
                 />
+
                 <span
                   style={{
                     fontWeight: "bolder",
                     fontSize: "1.2rem",
                     marginLeft: "0.5rem",
                   }}
-                >{`${selectedContact.firstName} ${selectedContact.lastName}`}</span>
+                >
+                  {selectedContact
+                    ? `${selectedContact.firstName} ${selectedContact.lastName}`
+                    : selectedGroup.groupName}
+                </span>
               </>
             )}
           </div>

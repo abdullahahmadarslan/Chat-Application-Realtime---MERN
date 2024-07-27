@@ -24,7 +24,7 @@ export const SocketProvider = ({ children }) => {
 
       // listening for online users event from the backend socket server to update the online status of the users in sidebar for each client
       socket.on("updateOnlineUsers", (users) => {
-        console.log("Received online users:", users);
+        // console.log("Received online users:", users);
         setOnlineUsers(users);
       });
 

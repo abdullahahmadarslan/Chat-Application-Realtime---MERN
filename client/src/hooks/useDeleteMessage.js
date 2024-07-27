@@ -32,7 +32,7 @@ export const useDeleteMessage = () => {
 
       toast.success("Message deleted successfully");
     } catch (error) {
-      toast.error(error.message);
+      toast.error("useDeleteMessage", error.message);
     }
   };
 

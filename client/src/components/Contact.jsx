@@ -3,7 +3,12 @@ import { useAuth } from "../context/AuthContext";
 import { useSocketContext } from "../context/SocketContext";
 
 export const Contact = ({ contact }) => {
-  const { selectedContact, setSelectedContact, contactsArray } = useAuth();
+  const {
+    selectedContact,
+    setSelectedContact,
+    contactsArray,
+    setSelectedGroup,
+  } = useAuth();
   const { onlineUsers } = useSocketContext();
   const isOnline = onlineUsers.includes(contact._id);
 
@@ -18,6 +23,7 @@ export const Contact = ({ contact }) => {
         d-flex flex-column flex-sm-column flex-md-row flex-lg-row mb-4 h-auto`}
         onClick={() => {
           setSelectedContact(contact);
+          setSelectedGroup(null); // Reset group selection when selecting a contact
         }}
       >
         {/* Avatar and Online Indicator */}

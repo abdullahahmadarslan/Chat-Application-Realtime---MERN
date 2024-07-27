@@ -36,7 +36,7 @@ export const useEditMessage = () => {
 
       toast.success("Message edited successfully");
     } catch (error) {
-      return toast.error(error.message);
+      return toast.error("useEditMessage", error.message);
     }
   };
   return { editMessage };
