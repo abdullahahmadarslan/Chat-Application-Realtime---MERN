@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useSocketContext } from "../context/SocketContext";
+import DeleteButton from "./DeleteButton";
+import ConfirmDeleteModal from "./ConfirmDeleteModal"; // Import the modal component
+import { useDeleteFriend } from "../hooks/useDeleteFriend";
 
 export const Contact = ({ contact }) => {
   const {
@@ -11,6 +14,21 @@ export const Contact = ({ contact }) => {
   } = useAuth();
   const { onlineUsers } = useSocketContext();
   const isOnline = onlineUsers.includes(contact._id);
+
+  const [showModal, setShowModal] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState(null);
+  const { deleteFriend } = useDeleteFriend();
+
+  const handleDeleteClick = (event) => {
+    event.stopPropagation(); // Prevents the event from bubbling up to the parent
+    setContactToDelete(contact);
+    setShowModal(true);
+  };
+
+  const handleConfirmDelete = (friendId) => {
+    deleteFriend(friendId);
+    setShowModal(false);
+  };
 
   return (
     <>
@@ -46,7 +64,16 @@ export const Contact = ({ contact }) => {
             contactsArray ? contact.lastName : ""
           }`}
         </span>
+        <DeleteButton onClick={handleDeleteClick} />
       </div>
+
+      <ConfirmDeleteModal
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        handleConfirm={handleConfirmDelete}
+        contactName={`${contactToDelete?.firstName} ${contactToDelete?.lastName}`}
+        friendId={contact._id}
+      />
     </>
   );
 };

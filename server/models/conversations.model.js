@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 
 const ConvSchema = new Schema(
   {
+    creator: { type: Schema.Types.ObjectId, ref: "Auth" },
     participants: [{ type: Schema.Types.ObjectId, ref: "Auth" }],
     messages: [{ type: Schema.Types.ObjectId, ref: "Message", default: [] }],
     isGroup: {
@@ -16,6 +17,7 @@ const ConvSchema = new Schema(
       type: String,
     },
   },
+
   { timestamps: true }
 );
 

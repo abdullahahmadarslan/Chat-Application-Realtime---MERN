@@ -6,11 +6,12 @@ const AuthContext = createContext();
 // provider
 export const AuthProvider = ({ children }) => {
   const [userAuth, setUserAuth] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
+      setLoading(true);
       try {
         const parsedUser = JSON.parse(storedUser);
         // console.log(parsedUser);
@@ -18,9 +19,10 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error("Failed to parse user from localStorage", error);
         localStorage.removeItem("user"); // Remove invalid data
+      } finally {
+        setLoading(false);
       }
     }
-    setLoading(false);
   }, []);
 
   // contacts
@@ -47,6 +49,10 @@ export const AuthProvider = ({ children }) => {
   // pending friend requests of the logged in user
   const [pendingRequests, setPendingRequests] = useState([]);
 
+  // group name and participants
+  const [groupName, setGroupName] = useState("");
+  const [participants, setParticipants] = useState([]);
+
   // provider
   return (
     <AuthContext.Provider
@@ -70,6 +76,10 @@ export const AuthProvider = ({ children }) => {
         setAllUsers,
         pendingRequests,
         setPendingRequests,
+        groupName,
+        setGroupName,
+        participants,
+        setParticipants,
       }}
     >
       {children}

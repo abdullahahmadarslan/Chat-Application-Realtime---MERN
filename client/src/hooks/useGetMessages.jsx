@@ -25,8 +25,6 @@ export const useGetMessages = () => {
         if (!serverResponse.ok) {
           setMessages([]);
         }
-        // console.log(data);
-
         setMessages(data);
         // console.log(data);
       } catch (error) {

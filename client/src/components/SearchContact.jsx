@@ -38,7 +38,10 @@ const SearchContact = () => {
 
   return (
     <>
-      <div className="left-top d-flex align-items-center justify-content-center container-fluid">
+      <div
+        className="left-top d-flex align-items-center justify-content-center container-fluid"
+        style={{ height: "10%" }}
+      >
         <form
           onSubmit={handleSubmit}
           className="d-flex align-items-center justify-content-center flex-column flex-sm-column flex-md-row flex-lg-row"

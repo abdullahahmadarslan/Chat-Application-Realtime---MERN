@@ -11,6 +11,7 @@ const {
   getSentFriendRequests,
   deleteFriendRequest,
   rejectFriendRequest,
+  deleteFriend,
 } = require("../controllers/friendRequest.controller");
 
 // middleware
@@ -25,6 +26,7 @@ router.delete(
   ProtectRoute,
   deleteFriendRequest
 );
+router.delete("/deleteFriend/:friendId", ProtectRoute, deleteFriend);
 router.put("/:requestId/accept", ProtectRoute, acceptFriendRequest);
 router.patch("/:requestId/reject", rejectFriendRequest);
 

@@ -9,6 +9,8 @@ export const useListenRequests = () => {
     setAllUsers,
     setContactsArray,
     setPendingRequests,
+    setGroupsArray,
+    setSelectedContact,
   } = useAuth();
 
   useEffect(() => {
@@ -55,6 +57,29 @@ export const useListenRequests = () => {
         prev.filter((req) => req.sender._id !== senderId)
       );
     };
+    const handleGroupCreated = (newGroup) => {
+      setGroupsArray((prevGroups) => {
+        return prevGroups.length > 0 ? [...prevGroups, newGroup] : [newGroup];
+      });
+    };
+    const handleSenderFriendRemoved = ({ friendId, friend }) => {
+      setContactsArray((users) =>
+        users.filter((user) => user._id.toString() !== friendId.toString())
+      );
+      setAllUsers((prev) => {
+        return prev.length > 0 ? [...prev, friend] : [friend]; //adding the person who is removed to the list of person which can be added on the sender side
+      });
+      setSelectedContact(null);
+    };
+    const handleReceiverFriendRemoved = ({ userId, user }) => {
+      setContactsArray((users) =>
+        users.filter((user) => user._id.toString() !== userId.toString())
+      );
+      setAllUsers((prev) => {
+        return prev.length > 0 ? [...prev, user] : [user];
+      });
+      setSelectedContact(null);
+    };
 
     // events
     socket.on("friendRequestAccepted", handleFriendReqAccepted); //sender side
@@ -74,7 +99,11 @@ export const useListenRequests = () => {
     socket.on(
       "receiverFriendRequestRejected",
       handleReceiverFriendRequestRejected
-    ); //on receiever side
+    ); //on receiver side
+
+    socket.on("groupCreated", handleGroupCreated); // receiver side
+    socket.on("SenderFriendRemoved", handleSenderFriendRemoved); // sender side
+    socket.on("ReceiverFriendRemoved", handleReceiverFriendRemoved); // receiver side
 
     // cleanup function to remove event listeners
     return () => {
@@ -97,6 +126,10 @@ export const useListenRequests = () => {
         "receiverFriendRequestRejected",
         handleReceiverFriendRequestRejected
       );
+      socket.off("groupCreated", handleGroupCreated);
+      socket.off("SenderFriendRemoved", handleSenderFriendRemoved);
+      socket.off("ReceiverFriendRemoved", handleSenderFriendRemoved);
+      socket.off("ReceiverFriendRemoved", handleReceiverFriendRemoved);
     };
     // eslint-disable-next-line
   }, [
@@ -105,5 +138,7 @@ export const useListenRequests = () => {
     setAllUsers,
     setContactsArray,
     setPendingRequests,
+    setGroupsArray,
+    setSelectedContact,
   ]);
 };

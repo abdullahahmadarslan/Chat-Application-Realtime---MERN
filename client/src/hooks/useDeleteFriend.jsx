@@ -1,10 +1,10 @@
 import { toast } from "react-toastify";
 
-export const useDeleteFriendRequest = () => {
-  const cancelFriendRequest = async (userId) => {
+export const useDeleteFriend = () => {
+  const deleteFriend = async (friendId) => {
     try {
       const serverResponse = await fetch(
-        `http://localhost:5000/friend-request/deleteFriendRequest/${userId}`,
+        `http://localhost:5000/friend-request/deleteFriend/${friendId}`,
         {
           method: "DELETE",
           withCredentials: true,
@@ -15,11 +15,11 @@ export const useDeleteFriendRequest = () => {
       if (!serverResponse.ok) {
         throw new Error(data.message);
       }
-      toast.success("Friend Request Cancelled!");
+      toast.success("Friend Removed Successfully!");
     } catch (error) {
-      toast.error("useDeleteFriendRequest" + error.message);
+      toast.error("useDeleteFriend" + error.message);
     }
   };
 
-  return { cancelFriendRequest };
+  return { deleteFriend };
 };

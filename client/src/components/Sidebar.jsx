@@ -12,6 +12,7 @@ import AddFriendsButton from "./AddFriendsButton";
 import PendingRequests from "./PendingRequests";
 import { useListenRequests } from "../hooks/useListenRequests";
 import { useGetAllUsers } from "../hooks/useGetAllUsers";
+import CreateGroupButton from "./CreateGroupButton";
 
 // sidebar
 export const Sidebar = () => {
@@ -58,10 +59,19 @@ export const Sidebar = () => {
           className="left-bottom container-fluid"
           style={{ paddingBottom: "60px" }}
         >
+          {/* friends buttons */}
+          <div
+            className="container-fluid sidebar-btns d-flex gap-5"
+            style={{ height: "10%" }}
+          >
+            <AddFriendsButton />
+            <PendingRequests />
+          </div>
           {/* contacts */}
-          <AddFriendsButton />
-          <PendingRequests />
-          <div className="contact-list" style={{ height: "50%" }}>
+          <div
+            className="contact-list"
+            style={{ height: "40%", overflow: "auto" }}
+          >
             <h5>Direct Messages:</h5>
             {contactsArray.length > 0 ? (
               contactsArray.map((contact) => (
@@ -72,8 +82,14 @@ export const Sidebar = () => {
             )}
           </div>
           {/* groups */}
-          <div className="contact-list mt-2" style={{ height: "48%" }}>
-            <h5>Groups:</h5>
+          <div
+            className="contact-list mt-2"
+            style={{ height: "40%", overflow: "auto" }}
+          >
+            <div className="container-fluid d-flex gap-5">
+              <h5>Groups:</h5>
+              <CreateGroupButton />
+            </div>
             {groupsArray.length > 0 ? (
               groupsArray.map((group) => (
                 <Group key={group._id} group={group} />

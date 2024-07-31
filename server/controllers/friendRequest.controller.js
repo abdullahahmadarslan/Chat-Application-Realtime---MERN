@@ -1,5 +1,6 @@
 const FriendRequest = require("../models/friendRequest.model");
 const AuthModel = require("../models/auth.model");
+const ConvModel = require("../models/conversations.model");
 const { io, getSocketId } = require("../socket/socket");
 
 // send a friend request
@@ -149,7 +150,10 @@ const deleteFriendRequest = async (req, res) => {
 const rejectFriendRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
-    const friendRequest = await FriendRequest.findById(requestId);
+    const friendRequest = await FriendRequest.findOne({
+      _id: requestId,
+      status: "pending",
+    });
 
     if (friendRequest && friendRequest.status === "pending") {
       friendRequest.status = "declined";
@@ -180,6 +184,47 @@ const rejectFriendRequest = async (req, res) => {
   }
 };
 
+// Deleting a friend
+const deleteFriend = async (req, res) => {
+  const { friendId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    // Remove friendId from user's friends list
+    await AuthModel.findByIdAndUpdate(userId, {
+      $pull: { friends: friendId },
+    });
+
+    // Remove userId from friend's friends list
+    await AuthModel.findByIdAndUpdate(friendId, {
+      $pull: { friends: userId },
+    });
+
+    // deleting the conversation between the 2 users too
+    await ConvModel.deleteOne({
+      participants: { $size: 2, $all: [userId, friendId] },
+    });
+    // Emit real-time events
+    const userSocketId = getSocketId(userId);
+    const friendSocketId = getSocketId(friendId);
+
+    const friend = await AuthModel.findOne({ _id: friendId });
+    const user = await AuthModel.findOne({ _id: userId });
+
+    if (userSocketId) {
+      io.to(userSocketId).emit("SenderFriendRemoved", { friendId, friend });
+    } //to sender
+
+    if (friendSocketId) {
+      io.to(friendSocketId).emit("ReceiverFriendRemoved", { userId, user });
+    } //to the person who is removed by the sender
+
+    res.status(200).json({ message: "Friend removed successfully." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // exporting
 module.exports = {
   getFriendRequests,
@@ -188,4 +233,5 @@ module.exports = {
   getSentFriendRequests,
   deleteFriendRequest,
   rejectFriendRequest,
+  deleteFriend,
 };

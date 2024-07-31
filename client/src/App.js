@@ -17,7 +17,6 @@ const App = () => {
   if (loading) {
     return <div>Loading...</div>; // or a spinner/loading indicator
   }
-
   return (
     <>
       <Routes>

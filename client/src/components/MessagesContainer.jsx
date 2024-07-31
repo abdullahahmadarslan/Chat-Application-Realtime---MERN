@@ -10,6 +10,7 @@ import ChatLoader from "../skeletons/ChatLoader";
 import WelcomeScreen from "./WelcomeScreen";
 import { useDeleteMessage } from "../hooks/useDeleteMessage";
 import { useEditMessage } from "../hooks/useEditMessage";
+import { AttachmentButton } from "./AttachmentButton";
 
 // const MessagesLoader = () => {
 //   return <div className="text-center">Loading messages...</div>;
@@ -162,6 +163,7 @@ export const MessagesContainer = () => {
             onSubmit={handleSubmit}
             style={{ height: "8%" }}
           >
+            <AttachmentButton />
             <input
               type="text"
               className="form-control"

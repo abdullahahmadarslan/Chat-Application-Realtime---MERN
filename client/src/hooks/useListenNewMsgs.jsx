@@ -10,24 +10,34 @@ export const useListenNewMsgs = () => {
     if (!socket) return;
 
     const handleNewMessage = (newMessage) => {
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-    };
-    const handleMessageEdited = (editedMessage) => {
       setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg._id === editedMessage._id
-            ? { ...msg, message: editedMessage.message, isEdited: true }
-            : msg
-        )
+        Array.isArray(prevMessages)
+          ? [...prevMessages, newMessage]
+          : [newMessage]
       );
     };
+
+    const handleMessageEdited = (editedMessage) => {
+      setMessages((prevMessages) =>
+        Array.isArray(prevMessages)
+          ? prevMessages.map((msg) =>
+              msg._id === editedMessage._id
+                ? { ...msg, message: editedMessage.message, isEdited: true }
+                : msg
+            )
+          : []
+      );
+    };
+
     const handleMessageDeleted = (deletedMessage) => {
       setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg._id === deletedMessage._id
-            ? { ...msg, isDeleted: true, message: "Message deleted" }
-            : msg
-        )
+        Array.isArray(prevMessages)
+          ? prevMessages.map((msg) =>
+              msg._id === deletedMessage._id
+                ? { ...msg, isDeleted: true, message: "Message deleted" }
+                : msg
+            )
+          : []
       );
     };
 
@@ -40,6 +50,5 @@ export const useListenNewMsgs = () => {
       socket.off("messageEdited", handleMessageEdited);
       socket.off("messageDeleted", handleMessageDeleted);
     };
-    // eslint-disable-next-line
-  }, [socket, messages, setMessages]);
+  }, [socket, setMessages, messages]);
 };

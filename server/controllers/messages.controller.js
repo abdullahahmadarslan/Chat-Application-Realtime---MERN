@@ -8,17 +8,27 @@ const ObjectId = mongoose.Types.ObjectId;
 const createGroup = async (req, res, next) => {
   try {
     const { groupName, participants } = req.body;
+    const creator = req.user._id;
 
     // generating profile picture of group
     const apiUrl = `https://ui-avatars.com/api/?name=${groupName}&rounded=true`;
 
     const newGroup = new ConvModel({
       groupName,
-      participants,
+      participants: [...participants, creator],
       isGroup: true,
       profilePicture: apiUrl,
+      creator,
     });
     await newGroup.save();
+
+    // Emit event to participants
+    participants.forEach((participantId) => {
+      const socketId = getSocketId(participantId);
+      if (socketId) {
+        io.to(socketId).emit("groupCreated", newGroup);
+      }
+    });
 
     res.status(201).json({
       message: "Group created successfully",
@@ -85,7 +95,8 @@ const sendMsg = async (req, res, next) => {
       await Promise.all([conversation.save(), newMessage.save()]);
 
       // Notify all participants
-      conversation.participants.forEach((participantId) => {
+      // console.log(conversation.participants);
+      uniqueObjectIdArray.forEach((participantId) => {
         const receiverSocketId = getSocketId(participantId);
         if (receiverSocketId) {
           io.to(receiverSocketId).emit("newMessage", newMessage);
