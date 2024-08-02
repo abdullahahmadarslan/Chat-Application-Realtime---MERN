@@ -164,7 +164,8 @@ body {
 }
 
 .message .text {
-  max-width: 60%;
+  max-width: 100%;
+  width: auto;
   padding: 10px;
   border-radius: 15px;
   /* position: relative; */
@@ -463,4 +464,32 @@ body {
 
 .deleteButton:hover .tooltip {
   opacity: 1;
+}
+
+/* chat message's image css */
+.chat-image {
+  max-width: 100%;
+  max-height: 200px;
+  /* Adjust based on your needs */
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.modal-image {
+  max-width: 100%;
+  max-height: 80vh;
+  display: block;
+  margin: 0 auto;
+}
+
+.modal-close-btn {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+
 }

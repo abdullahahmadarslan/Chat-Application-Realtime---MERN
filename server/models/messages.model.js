@@ -28,6 +28,11 @@ const MsgSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    type: {
+      type: String,
+      enum: ["text", "image", "video", "audio"],
+      required: true,
+    },
   },
   { timestamps: true }
 );

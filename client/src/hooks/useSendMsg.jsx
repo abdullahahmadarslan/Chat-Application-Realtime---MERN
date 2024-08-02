@@ -6,7 +6,7 @@ export const useSendMsg = () => {
   const [loading, setLoading] = useState(false);
   const { selectedContact, setMessages, selectedGroup } = useAuth();
 
-  const sendMsg = async (message) => {
+  const sendMsg = async (message, type) => {
     setLoading(true);
     try {
       // url to be decided based on direct message or group
@@ -19,7 +19,7 @@ export const useSendMsg = () => {
         withCredentials: true,
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, type }),
       });
       const data = await serverResponse.json();
       if (!serverResponse.ok) {

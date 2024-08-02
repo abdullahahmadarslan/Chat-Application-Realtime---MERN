@@ -43,7 +43,7 @@ const createGroup = async (req, res, next) => {
 // Send a message to a group or direct message
 const sendMsg = async (req, res, next) => {
   try {
-    const { message } = req.body;
+    const { message, type } = req.body;
     const { recipientIds } = req.params;
     const senderId = req.user._id;
 
@@ -86,6 +86,7 @@ const sendMsg = async (req, res, next) => {
       receiver: uniqueObjectIdArray, // Assuming the receiver field can store an array
       sender: senderId,
       message,
+      type,
     });
     console.log(newMessage);
 

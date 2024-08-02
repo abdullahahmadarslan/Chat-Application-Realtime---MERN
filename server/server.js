@@ -17,7 +17,7 @@ const messageRouter = require("./routes/messages.router");
 const userRouter = require("./routes/users.routes");
 const groupRouter = require("./routes/groups.routes.js");
 const friendRequestRouter = require("./routes/friendRequest.routes.js");
-
+const uploadRouter = require("./routes/upload.routes.js");
 // importing middlewares
 const errorMiddleware = require("./middlewares/error-middleware");
 
@@ -42,6 +42,7 @@ app.use("/message", messageRouter);
 app.use("/users", userRouter);
 app.use("/groups", groupRouter);
 app.use("/friend-request", friendRequestRouter);
+app.use("/cloudinary", uploadRouter);
 
 // error handling middleware
 app.use(errorMiddleware);

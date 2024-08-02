@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
+import { Link } from "react-router-dom";
+import Modal from "react-modal";
+import { IoMdClose } from "react-icons/io";
 
 export const ChatMessage = ({ messagee, onDelete, onEdit }) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -10,6 +13,7 @@ export const ChatMessage = ({ messagee, onDelete, onEdit }) => {
   const [newMessage, setNewMessage] = useState(messagee.message);
   const [showButtons, setShowButtons] = useState(false);
   const [showArrow, setShowArrow] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -29,13 +33,78 @@ export const ChatMessage = ({ messagee, onDelete, onEdit }) => {
     setShowButtons(!showButtons);
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // Render different types of messages based on the message type
+  const renderMessageContent = () => {
+    switch (messagee.type) {
+      case "image":
+        return (
+          <>
+            <img
+              className="chat-image"
+              src={messagee?.message.toString()}
+              alt="User uploaded content"
+              onClick={openModal}
+            />
+            <Modal
+              isOpen={isModalOpen}
+              onRequestClose={closeModal}
+              contentLabel="Image Modal"
+            >
+              <div className="container-fluid d-flex flex-column">
+                <img
+                  className="modal-image"
+                  src={messagee?.message.toString()}
+                  alt="User uploaded content"
+                />
+                <button
+                  className="btn btn-danger modal-close-btn rounded-5"
+                  type="button"
+                  onClick={closeModal}
+                  style={{ marginTop: "auto" }}
+                >
+                  <IoMdClose style={{ fontSize: "30px" }} />
+                </button>
+              </div>
+            </Modal>
+          </>
+        );
+      case "video":
+        return (
+          <video controls style={{ maxWidth: "100%" }}>
+            <source src={messagee?.message.toString()} type="video/mp4" />
+          </video>
+        );
+      case "audio":
+        return (
+          <audio controls>
+            <source src={messagee?.message.toString()} type="audio/mpeg" />
+          </audio>
+        );
+      case "file":
+        return <Link to={messagee?.message.toString()} />;
+
+      case "text":
+        return messagee.message;
+      default:
+        return messagee.message;
+    }
+  };
+
   // Determine if the message should be visible
   const shouldShowMessage = fromMe ? !messagee.isDeleted : true; //!messagee.isDeleted means The message should only be shown if it is not deleted.
   const messageContent =
     fromMe && messagee.isDeleted ? null : messagee.isDeleted && !fromMe ? (
       <span className="message-deleted">Message deleted</span>
     ) : (
-      messagee.message
+      renderMessageContent()
     ); //here if the message is from us and is deleted then setting content to null doesn't matter as before this we would ve setted the shouldShowMessage to false so we won't see the message regardless
 
   return shouldShowMessage ? (

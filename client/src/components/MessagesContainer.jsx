@@ -61,7 +61,7 @@ export const MessagesContainer = () => {
       event.preventDefault();
 
       if (!message) return;
-      await sendMsg(message);
+      await sendMsg(message, "text");
       setMessage("");
     } catch (error) {
       toast.error("message container" + error.message);
