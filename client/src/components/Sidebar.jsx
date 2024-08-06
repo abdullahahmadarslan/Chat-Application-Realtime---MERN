@@ -13,13 +13,22 @@ import PendingRequests from "./PendingRequests";
 import { useListenRequests } from "../hooks/useListenRequests";
 import { useGetAllUsers } from "../hooks/useGetAllUsers";
 import CreateGroupButton from "./CreateGroupButton";
+import { useListenGroupRequests } from "../hooks/useListenGroupRequests";
+import { IoHome } from "react-icons/io5";
 
 // sidebar
 export const Sidebar = () => {
   const { logout, loading } = useLogout();
   const { getContacts } = useGetContacts();
   const { getGroups } = useGetGroups();
-  const { contactsArray, groupsArray } = useAuth();
+  const {
+    contactsArray,
+    groupsArray,
+    selectedContact,
+    selectedGroup,
+    setSelectedContact,
+    setSelectedGroup,
+  } = useAuth();
   const { getAllUsers } = useGetAllUsers();
 
   // getting contacts from the backend when the home page loads for the first time
@@ -46,6 +55,9 @@ export const Sidebar = () => {
   // Listening for request actions
   useListenRequests();
 
+  // listening for group events
+  useListenGroupRequests();
+
   return (
     <>
       <div
@@ -61,9 +73,19 @@ export const Sidebar = () => {
         >
           {/* friends buttons */}
           <div
-            className="container-fluid sidebar-btns d-flex gap-5"
+            className="container-fluid sidebar-btns d-flex gap-1"
             style={{ height: "10%" }}
           >
+            <button
+              type="button"
+              className="btn home-btn"
+              onClick={() => {
+                if (selectedContact) setSelectedContact(null);
+                if (selectedGroup) setSelectedGroup(null);
+              }}
+            >
+              <IoHome style={{ color: "white", fontSize: "25px" }} />
+            </button>
             <AddFriendsButton />
             <PendingRequests />
           </div>

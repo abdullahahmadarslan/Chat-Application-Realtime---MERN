@@ -40,13 +40,14 @@ const CreateGroupButton = () => {
     }
     createGroup();
   };
+
   //setting the participants array on form check/uncheck
   const handleParticipantChange = (contactId) => {
     setParticipants((prev) => {
       const newParticipants = prev.includes(contactId)
         ? prev.filter((id) => id !== contactId)
         : [...prev, contactId];
-      //   console.log(newParticipants);
+      console.log(newParticipants);
       return newParticipants;
     });
   };

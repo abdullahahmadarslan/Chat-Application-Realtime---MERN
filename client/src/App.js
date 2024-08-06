@@ -6,6 +6,7 @@ import { useAuth } from "./context/AuthContext.jsx";
 import LoginPage from "./pages/login/login";
 import SignupPage from "./pages/signup/signup";
 import Home from "./pages/home/Home";
+import { LoadingAnimation } from "./components/custom/LoadingAnimation.jsx";
 
 // app
 const App = () => {
@@ -15,7 +16,7 @@ const App = () => {
   // console.log("loading:", loading);
 
   if (loading) {
-    return <div>Loading...</div>; // or a spinner/loading indicator
+    return <LoadingAnimation />;
   }
   return (
     <>

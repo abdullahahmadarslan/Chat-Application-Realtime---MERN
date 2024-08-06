@@ -11,6 +11,8 @@ import WelcomeScreen from "./WelcomeScreen";
 import { useDeleteMessage } from "../hooks/useDeleteMessage";
 import { useEditMessage } from "../hooks/useEditMessage";
 import { AttachmentButton } from "./AttachmentButton";
+import { GroupEditButton } from "./GroupEditButton";
+import { GroupMembersButton } from "./GroupMembersButton";
 
 // const MessagesLoader = () => {
 //   return <div className="text-center">Loading messages...</div>;
@@ -19,8 +21,13 @@ import { AttachmentButton } from "./AttachmentButton";
 export const MessagesContainer = () => {
   const [message, setMessage] = useState("");
   const { loading, sendMsg } = useSendMsg();
-  const { selectedContact, setSelectedContact, messages, selectedGroup } =
-    useAuth();
+  const {
+    selectedContact,
+    setSelectedContact,
+    messages,
+    selectedGroup,
+    userAuth,
+  } = useAuth();
   const { getMessages, loadingMsgs } = useGetMessages();
   const lastMessageRef = useRef(null); // Reference to the last message
   const { deleteMessage } = useDeleteMessage();
@@ -90,32 +97,39 @@ export const MessagesContainer = () => {
           >
             {(selectedContact || selectedGroup) && (
               <>
-                <img
-                  src={
-                    selectedContact
-                      ? selectedContact.profilePicture
-                      : selectedGroup.profilePicture
-                  }
-                  alt={
-                    selectedContact
-                      ? `${selectedContact.firstName} ${selectedContact.lastName}`
-                      : selectedGroup.groupName
-                  }
-                  className="img-fluid rounded-circle me-2"
-                  style={{ height: "80%" }}
-                />
+                {selectedGroup && <GroupMembersButton />}
+                <div className="container-fluid d-flex justify-content-center align-items-center h-100 ">
+                  <img
+                    src={
+                      selectedContact
+                        ? selectedContact.profilePicture
+                        : selectedGroup.profilePicture
+                    }
+                    alt={
+                      selectedContact
+                        ? `${selectedContact.firstName} ${selectedContact.lastName}`
+                        : selectedGroup.groupName
+                    }
+                    className="rounded-circle me-2"
+                    style={{ height: "50px", width: "50px" }}
+                  />
 
-                <span
-                  style={{
-                    fontWeight: "bolder",
-                    fontSize: "1.2rem",
-                    marginLeft: "0.5rem",
-                  }}
-                >
-                  {selectedContact
-                    ? `${selectedContact.firstName} ${selectedContact.lastName}`
-                    : selectedGroup.groupName}
-                </span>
+                  <span
+                    style={{
+                      fontWeight: "bolder",
+                      fontSize: "1.2rem",
+                      marginLeft: "0.5rem",
+                    }}
+                  >
+                    {selectedContact
+                      ? `${selectedContact.firstName} ${selectedContact.lastName}`
+                      : selectedGroup.groupName}
+                  </span>
+                </div>
+                {selectedGroup &&
+                selectedGroup?.creator?.toString() === userAuth._id ? (
+                  <GroupEditButton group={selectedGroup} />
+                ) : null}
               </>
             )}
           </div>
@@ -157,6 +171,7 @@ export const MessagesContainer = () => {
             {/* Reference div to scroll to the last message */}
             <div ref={lastMessageRef} />
           </div>
+
           {/* Footer */}
           <form
             className="chat-footer bg-light p-2 d-flex"

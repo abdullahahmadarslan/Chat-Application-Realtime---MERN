@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { LoadingAnimation } from "./custom/LoadingAnimation";
+import { UserEditButton } from "./UserEditButton";
 
 const WelcomeScreen = () => {
   const { userAuth, loading, setUserAuth } = useAuth();
@@ -13,7 +15,7 @@ const WelcomeScreen = () => {
   }, [userAuth, setUserAuth]);
 
   if (loading || !user) {
-    return <div>Loading...</div>; // or a spinner/loading indicator
+    return <LoadingAnimation />;
   }
 
   return (
@@ -24,7 +26,7 @@ const WelcomeScreen = () => {
         height: "100vh",
       }}
     >
-      <div className="text-center container-fluid mb-5">
+      <div className="text-center container-fluid mt-5">
         <img
           src={`${process.env.PUBLIC_URL}/welcome.png`} // Assuming you have an avatarUrl field in userAuth
           alt="welcome"
@@ -40,6 +42,7 @@ const WelcomeScreen = () => {
           We are excited to have you here. Let’s start chatting!
         </p>
       </div>
+      <UserEditButton />
     </div>
   );
 };

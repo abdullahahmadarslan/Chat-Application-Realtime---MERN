@@ -53,6 +53,9 @@ export const AuthProvider = ({ children }) => {
   const [groupName, setGroupName] = useState("");
   const [participants, setParticipants] = useState([]);
 
+  // current group members
+  const [currentGroupMembers, setCurrentGroupMembers] = useState([]);
+
   // provider
   return (
     <AuthContext.Provider
@@ -80,6 +83,8 @@ export const AuthProvider = ({ children }) => {
         setGroupName,
         participants,
         setParticipants,
+        currentGroupMembers,
+        setCurrentGroupMembers,
       }}
     >
       {children}
