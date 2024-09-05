@@ -25,37 +25,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // contacts
-  const [selectedContact, setSelectedContact] = useState(null);
-
-  // contacts array which are friends of current logged in user
-  const [contactsArray, setContactsArray] = useState([]);
-
-  // get all users from the database except the logged in user
-  const [allUsers, setAllUsers] = useState([]);
-
-  // messages array for selected group or contact
-  const [messages, setMessages] = useState([]);
-
-  // groups
-  const [selectedGroup, setSelectedGroup] = useState(null);
-
-  // groups array for sidebar
-  const [groupsArray, setGroupsArray] = useState([]);
-
-  //toSentRequestIds
-  const [toSentRequestIds, setToSentRequestIds] = useState([]);
-
-  // pending friend requests of the logged in user
-  const [pendingRequests, setPendingRequests] = useState([]);
-
-  // group name and participants
-  const [groupName, setGroupName] = useState("");
-  const [participants, setParticipants] = useState([]);
-
-  // current group members
-  const [currentGroupMembers, setCurrentGroupMembers] = useState([]);
-
   // provider
   return (
     <AuthContext.Provider
@@ -63,28 +32,6 @@ export const AuthProvider = ({ children }) => {
         userAuth,
         setUserAuth,
         loading,
-        selectedContact,
-        setSelectedContact,
-        messages,
-        setMessages,
-        contactsArray,
-        setContactsArray,
-        groupsArray,
-        setGroupsArray,
-        selectedGroup,
-        setSelectedGroup,
-        toSentRequestIds,
-        setToSentRequestIds,
-        allUsers,
-        setAllUsers,
-        pendingRequests,
-        setPendingRequests,
-        groupName,
-        setGroupName,
-        participants,
-        setParticipants,
-        currentGroupMembers,
-        setCurrentGroupMembers,
       }}
     >
       {children}

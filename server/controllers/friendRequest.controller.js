@@ -34,8 +34,11 @@ const sendFriendRequest = async (req, res) => {
     }
 
     res.status(201).json(friendRequest);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(`Server error while sending friend request: ${err}`);
+    next({
+      errorDetails: "Internal Server Error While sending friend request",
+    });
   }
 };
 
@@ -80,8 +83,11 @@ const acceptFriendRequest = async (req, res) => {
         .status(404)
         .json({ error: "Friend request not found or already processed" });
     }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(`Server error while accepting friend request: ${err}`);
+    next({
+      errorDetails: "Internal Server Error While accepting friend request",
+    });
   }
 };
 
@@ -96,10 +102,13 @@ const getFriendRequests = async (req, res) => {
 
     // if no requests found
     if (!requests)
-      req.status(404).json({ error: "no pending friend requests" });
+      req.status(404).json({ message: "no pending friend requests" });
     res.status(200).json(requests);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(`Server error while getting friend requests: ${err}`);
+    next({
+      errorDetails: "Internal Server Error While getting friend requests",
+    });
   }
 };
 
@@ -112,8 +121,11 @@ const getSentFriendRequests = async (req, res) => {
       status: "pending",
     });
     res.status(200).json(requests);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(`Server error while getting sent friend requests: ${err}`);
+    next({
+      errorDetails: "Internal Server Error While getting sent friend requests",
+    });
   }
 };
 
@@ -141,8 +153,11 @@ const deleteFriendRequest = async (req, res) => {
     io.to(receiverSocketId).emit("cancelFriendRequestBySender", senderId);
 
     res.status(200).json({ message: "Friend request deleted successfully." });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(`Server error while deleting sent friend request: ${err}`);
+    next({
+      errorDetails: "Internal Server Error While deleting sent friend request",
+    });
   }
 };
 
@@ -179,8 +194,11 @@ const rejectFriendRequest = async (req, res) => {
         .status(404)
         .json({ error: "Friend request not found or already processed" });
     }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(`Server error while rejecting friend request: ${err}`);
+    next({
+      errorDetails: "Internal Server Error While rejecting friend request",
+    });
   }
 };
 
@@ -220,8 +238,11 @@ const deleteFriend = async (req, res) => {
     } //to the person who is removed by the sender
 
     res.status(200).json({ message: "Friend removed successfully." });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(`Server error while deleting a friend: ${err}`);
+    next({
+      errorDetails: "Internal Server Error While deleting a friend",
+    });
   }
 };
 

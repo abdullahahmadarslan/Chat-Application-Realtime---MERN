@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 
 export const useRejectFriendRequest = () => {
   const [loadingRejectFr, setLoading] = useState(false);
 
-  const rejectFriendReq = async (requestId) => {
+  const rejectFriendReq = useCallback(async (requestId) => {
     setLoading(true);
     try {
       const serverResponse = await fetch(
@@ -21,12 +21,12 @@ export const useRejectFriendRequest = () => {
       }
       toast.success("Friend Request Rejected!");
     } catch (error) {
-      toast.error("rejectFriendReq" + error.message);
+      toast.error(error.message);
       console.log(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return { loadingRejectFr, rejectFriendReq };
 };

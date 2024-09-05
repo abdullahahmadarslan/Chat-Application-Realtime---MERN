@@ -1,7 +1,8 @@
+import { useCallback } from "react";
 import { toast } from "react-toastify";
 
 export const useDeleteFriend = () => {
-  const deleteFriend = async (friendId) => {
+  const deleteFriend = useCallback(async (friendId) => {
     try {
       const serverResponse = await fetch(
         `http://localhost:5000/friend-request/deleteFriend/${friendId}`,
@@ -17,9 +18,9 @@ export const useDeleteFriend = () => {
       }
       toast.success("Friend Removed Successfully!");
     } catch (error) {
-      toast.error("useDeleteFriend" + error.message);
+      toast.error(error.message);
     }
-  };
+  }, []);
 
   return { deleteFriend };
 };

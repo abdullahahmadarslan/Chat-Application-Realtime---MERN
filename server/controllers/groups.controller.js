@@ -43,7 +43,7 @@ const editGroup = async (req, res, next) => {
     );
 
     if (!updatedGroup) {
-      return res.status(404).json({ message: "Document not found" });
+      return res.status(404).json({ message: "group not found" });
     }
 
     // emitting event to all user that group got updated
@@ -175,10 +175,71 @@ const removeMember = async (req, res, next) => {
   }
 };
 
+// delete group
+const deleteGroup = async (req, res, next) => {
+  const { groupId } = req.params;
+
+  try {
+    // Delete the group conversation
+    const deletedGroup = await ConvModel.findByIdAndDelete(groupId);
+
+    if (!deletedGroup) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    // emitting event to all user that group got deleted
+    deletedGroup.participants.forEach((id) => {
+      const receiverSocketId = getSocketId(id);
+      if (receiverSocketId)
+        io.to(receiverSocketId).emit("groupDeleted", groupId);
+    });
+
+    res.status(200).json(deletedGroup);
+  } catch (err) {
+    console.error(`Server error while deleting the group: ${err}`);
+    const error = {
+      errorDetails: "Internal Server Error While deleting the group",
+    };
+    next(error);
+  }
+};
+
+const leaveGroup = async (req, res, next) => {
+  const { groupId } = req.params;
+  const userId = req.user._id; // The user who left the group is the currently logged-in user
+
+  try {
+    // Pull the userId from the participants array of the group
+    const group = await ConvModel.findByIdAndUpdate(
+      groupId,
+      { $pull: { participants: userId } },
+      { new: true }
+    );
+
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    // emitting real time event to remove the group from the person's client side who left the group
+    const receiverSocketId = getSocketId(userId);
+    if (receiverSocketId) io.to(receiverSocketId).emit("leftGroup", groupId); //filter this id of the user from the current participants of the current group
+
+    res.status(200).json({ message: "Successfully left the group" });
+  } catch (err) {
+    console.error(`Server error while leaving the group: ${err}`);
+    const error = {
+      errorDetails: "Internal Server Error While leaving the group",
+    };
+    next(error);
+  }
+};
+
 module.exports = {
   getGroupsForSidebar,
   editGroup,
   getGroupMembers,
   addMember,
   removeMember,
+  deleteGroup,
+  leaveGroup,
 };

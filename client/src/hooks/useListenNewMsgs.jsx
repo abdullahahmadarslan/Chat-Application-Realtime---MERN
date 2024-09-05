@@ -1,10 +1,13 @@
 import { useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
 import { useSocketContext } from "../context/SocketContext";
+import useStore from "../stores/useStore";
 
 export const useListenNewMsgs = () => {
   const { socket } = useSocketContext();
-  const { messages, setMessages } = useAuth();
+  const { messages, setMessages } = useStore((state) => ({
+    messages: state.messages,
+    setMessages: state.setMessages,
+  }));
 
   useEffect(() => {
     if (!socket) return;

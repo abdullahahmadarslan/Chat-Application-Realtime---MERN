@@ -9,6 +9,8 @@ const {
   getGroupMembers,
   addMember,
   removeMember,
+  deleteGroup,
+  leaveGroup,
 } = require("../controllers/groups.controller");
 
 // middleware
@@ -20,6 +22,8 @@ router.get("/getGroupMembers/:groupId", ProtectRoute, getGroupMembers);
 router.patch("/editGroup/:groupId", ProtectRoute, editGroup);
 router.patch("/:groupId/addMember", ProtectRoute, addMember);
 router.delete("/:groupId/removeMember", ProtectRoute, removeMember);
+router.delete("/deleteGroup/:groupId", ProtectRoute, deleteGroup);
+router.delete("/leaveGroup/:groupId", ProtectRoute, leaveGroup);
 
 // exporting
 module.exports = router;

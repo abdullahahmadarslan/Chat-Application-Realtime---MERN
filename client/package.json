@@ -8,6 +8,9 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.3",
     "bootstrap": "^5.3.3",
+    "cloudinary-build-url": "^0.2.4",
+    "cloudinary-react": "^1.8.1",
+    "emoji-picker-react": "^4.11.1",
     "js-cookie": "^3.0.5",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.4",
@@ -18,7 +21,8 @@
     "react-scripts": "5.0.1",
     "react-toastify": "^10.0.5",
     "socket.io-client": "^4.7.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zustand": "^4.5.4"
   },
   "scripts": {
     "start": "react-scripts start",

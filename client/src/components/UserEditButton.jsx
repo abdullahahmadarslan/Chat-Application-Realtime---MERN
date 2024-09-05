@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { ImageLoader } from "./custom/ImageLoader";
 import { useEditUser } from "../hooks/useEditUser";
 
-export const UserEditButton = () => {
+export const UserEditButton = React.memo(() => {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const userAuth = JSON.parse(localStorage.getItem("user"));
@@ -15,25 +15,21 @@ export const UserEditButton = () => {
     lastName: userAuth.lastName,
   });
   const [newUserAvatar, setNewUserAvatar] = useState(userAuth.profilePicture);
+
+  // custom hook
   const { editUser, loadingEditUser } = useEditUser();
 
-  const handleClose = () => {
-    setShow(false);
-  };
-  const handleShow = () => {
-    setShow(true);
-  };
+  const handleClose = useCallback(() => setShow(false), []);
+  const handleShow = useCallback(() => setShow(true), []);
 
-  //handling avatar change when you upload a new avatar
-  const handleAvatarChange = async (event, type) => {
+  // Handling avatar change when you upload a new avatar
+  const handleAvatarChange = useCallback(async (event) => {
     const selectedFile = event.target.files[0];
 
-    // Now making a request to backend to upload file to Cloudinary as soon as it is selected
     if (selectedFile) {
       const formData = new FormData();
       formData.append("file", selectedFile);
 
-      // Sending file to backend which uploads it to Cloudinary and returns the URL of the file
       setLoading(true);
       try {
         const response = await axios.post(
@@ -45,25 +41,25 @@ export const UserEditButton = () => {
             },
           }
         );
-        toast.success("Image uploaded successfully");
+        // toast.success("Image uploaded successfully");
 
-        // sending the file's url as a message now from senders side
         const fileUrl = response.data.url.toString();
         setNewUserAvatar(fileUrl);
       } catch (error) {
-        toast.error("Error uploading file:", error);
+        toast.error("Error uploading file");
         console.error(error);
       } finally {
         setLoading(false);
+        event.target.value = null;
       }
     }
-  };
+  }, []);
 
-  //   handling submit of changes
-  const handleSaveChanges = async () => {
+  // Handling submit of changes
+  const handleSaveChanges = useCallback(async () => {
     console.log(newUserAvatar, newUserInfo);
-    editUser(newUserInfo, newUserAvatar);
-  };
+    await editUser(newUserInfo, newUserAvatar);
+  }, [editUser, newUserInfo, newUserAvatar]);
 
   return (
     <>
@@ -183,4 +179,4 @@ export const UserEditButton = () => {
       </Modal>
     </>
   );
-};
+});

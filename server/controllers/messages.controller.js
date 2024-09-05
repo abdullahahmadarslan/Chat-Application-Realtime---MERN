@@ -7,17 +7,19 @@ const ObjectId = mongoose.Types.ObjectId;
 // Create a group chat
 const createGroup = async (req, res, next) => {
   try {
-    const { groupName, participants } = req.body;
+    const { groupName, participants, profilePicture } = req.body;
     const creator = req.user._id;
 
     // generating profile picture of group
-    const apiUrl = `https://ui-avatars.com/api/?name=${groupName}&rounded=true`;
+    const pfpUrl = profilePicture
+      ? profilePicture
+      : `https://ui-avatars.com/api/?name=${groupName}&rounded=true`;
 
     const newGroup = new ConvModel({
       groupName,
       participants: [...participants, creator],
       isGroup: true,
-      profilePicture: apiUrl,
+      profilePicture: pfpUrl,
       creator,
     });
     await newGroup.save();
@@ -43,7 +45,7 @@ const createGroup = async (req, res, next) => {
 // Send a message to a group or direct message
 const sendMsg = async (req, res, next) => {
   try {
-    const { message, type } = req.body;
+    const { message, type, isGroup, isSafe } = req.body;
     const { recipientIds } = req.params;
     const senderId = req.user._id;
 
@@ -71,13 +73,14 @@ const sendMsg = async (req, res, next) => {
         $size: sortedParticipants.length,
         $all: sortedParticipants,
       },
+      isGroup,
     });
 
     // Create a new conversation if it does not exist
     if (!conversation) {
       conversation = new ConvModel({
         participants: sortedParticipants,
-        isGroup: recipientArrayNew.length > 1, // Determine if it is a group chat
+        isGroup,
       });
     }
 
@@ -87,26 +90,31 @@ const sendMsg = async (req, res, next) => {
       sender: senderId,
       message,
       type,
+      isSafe,
     });
-    console.log(newMessage);
 
     if (newMessage) {
       // Push the message reference ID in the conversation document's messages array
       conversation.messages.push(newMessage._id);
       await Promise.all([conversation.save(), newMessage.save()]);
 
+      // Populate the sender field in the message before returning
+      const populatedMessage = await MsgModel.findById(newMessage._id).populate(
+        "sender"
+      );
+
       // Notify all participants
       // console.log(conversation.participants);
       uniqueObjectIdArray.forEach((participantId) => {
         const receiverSocketId = getSocketId(participantId);
         if (receiverSocketId) {
-          io.to(receiverSocketId).emit("newMessage", newMessage);
+          io.to(receiverSocketId).emit("newMessage", populatedMessage);
         }
       });
 
       res.status(201).json({
         message: "Message sent successfully",
-        newMessage,
+        populatedMessage,
       });
     }
   } catch (err) {
@@ -119,7 +127,7 @@ const getMsgs = async (req, res, next) => {
   try {
     const { recipientIds } = req.params; //always a string is returned
     const senderId = req.user._id;
-
+    const { isGroup } = req.query;
     // Split recipientIds into an array if it's a comma-separated string
     const recipientArrayNew = recipientIds.split(",").map((id) => id.trim());
 
@@ -144,7 +152,13 @@ const getMsgs = async (req, res, next) => {
         $size: sortedParticipants.length,
         $all: sortedParticipants,
       },
-    }).populate("messages");
+      isGroup,
+    }).populate({
+      path: "messages",
+      populate: {
+        path: "sender", //  populating sender within the messages
+      },
+    });
 
     if (!conversation) {
       return res.status(404).json({ message: "No conversation found" });
@@ -163,13 +177,31 @@ const deleteMsg = async (req, res, next) => {
   try {
     const { messageId } = req.params;
     const userId = req.user._id;
-
+    const { receiver } = req.body; //flag to differentiate between sender and receiver deletion
+    console.log(receiver);
     const message = await MsgModel.findById(messageId);
 
     if (!message) {
       return res.status(404).json({ message: "Message not found" });
     }
 
+    // Check if the deletion is from the receiver's side
+    if (receiver.isReceiver) {
+      if (!message.receiver.includes(userId)) {
+        return res.status(403).json({ message: "Unauthorized action" });
+      }
+
+      // Set the flag indicating the receiver has deleted the message
+      message.isDeletedByReceiver = true;
+
+      await message.save();
+
+      return res
+        .status(200)
+        .json({ message: "Message deleted for receiver only" });
+    }
+
+    // Check if the deletion is from the sender's side
     if (message.sender.toString() !== userId.toString()) {
       return res.status(403).json({ message: "Unauthorized action" });
     }
@@ -179,11 +211,13 @@ const deleteMsg = async (req, res, next) => {
 
     await message.save();
 
-    // Emit the messageDeleted
-    const receiverSocketId = getSocketId(message.receiver);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("messageDeleted", message);
-    }
+    // Emit the messageDeleted event to all receivers
+    message.receiver.forEach((receiverId) => {
+      const receiverSocketId = getSocketId(receiverId);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("messageDeleted", message);
+      }
+    });
 
     res.status(200).json({ message: "Message deleted successfully" });
   } catch (err) {
@@ -214,12 +248,15 @@ const editMsg = async (req, res, next) => {
     msg.isEdited = true;
 
     await msg.save();
+    // console.log(msg);
 
-    // Emit the messageEdited event to the receiver
-    const receiverSocketId = getSocketId(msg.receiver);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("messageEdited", msg);
-    }
+    // Emit the messageEdited event to all receivers
+    msg.receiver.forEach((receiverId) => {
+      const receiverSocketId = getSocketId(receiverId);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("messageEdited", msg);
+      }
+    });
 
     res.status(200).json({ message: "Message edited successfully" });
   } catch (err) {

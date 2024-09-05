@@ -1,13 +1,15 @@
 import { toast } from "react-toastify";
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useCallback, useState } from "react";
+import useStore from "../stores/useStore";
 
 export const useGetContacts = () => {
   //   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { setContactsArray } = useAuth();
+  const { setContactsArray } = useStore((state) => ({
+    setContactsArray: state.setContactsArray,
+  }));
 
-  const getContacts = async () => {
+  const getContacts = useCallback(async () => {
     setLoading(true);
     try {
       const serverResponse = await fetch("http://localhost:5000/users/", {
@@ -20,14 +22,14 @@ export const useGetContacts = () => {
         setContactsArray([]);
         throw new Error(data.message);
       }
-      console.log(data);
+      // console.log(data);
       setContactsArray(data);
     } catch (error) {
-      toast.error("useGetContacts" + error.message);
+      console.error(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [setContactsArray]);
 
   return { loading, getContacts };
 };

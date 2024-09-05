@@ -1,13 +1,15 @@
-import { toast } from "react-toastify";
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+// import { toast } from "react-toastify";
+import { useCallback, useState } from "react";
+import useStore from "../stores/useStore";
 
 export const useGetAllUsers = () => {
   //   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { setAllUsers } = useAuth();
+  const { setAllUsers } = useStore((state) => ({
+    setAllUsers: state.setAllUsers,
+  }));
 
-  const getAllUsers = async () => {
+  const getAllUsers = useCallback(async () => {
     setLoading(true);
     try {
       const serverResponse = await fetch(
@@ -25,11 +27,11 @@ export const useGetAllUsers = () => {
       //   console.log(data);
       setAllUsers(data);
     } catch (error) {
-      toast.error("useGetAllUsers" + error.message);
+      console.error(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [setAllUsers]);
 
   return { loading, getAllUsers };
 };

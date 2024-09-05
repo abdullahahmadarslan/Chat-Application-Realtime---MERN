@@ -40,6 +40,7 @@ const ProtectRoute = async (req, res, next) => {
       }
     );
   } catch (error) {
+    localStorage.removeItem("user");
     console.error(`Error protecting route: ${error.message}`);
     res.status(500).json({ message: "Server error" });
   }

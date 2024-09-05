@@ -6,7 +6,6 @@ const bcrypt = require("bcryptjs");
 // signup
 const signup = async (req, res, next) => {
   try {
-    // logic
     const {
       firstName,
       lastName,
@@ -15,26 +14,33 @@ const signup = async (req, res, next) => {
       phone,
       email,
       password,
-      cpassword
+      cpassword,
+      profilePicture,
     } = req.body;
 
-    // checking passwords
+    // Checking if passwords match
     if (password !== cpassword) {
-      return res.status(400).json({ message: "passwords don't match" });
+      return res.status(400).json({ message: "Passwords don't match" });
     }
 
-    // checking if user name already exists
-    const existingUser = await AuthModel.findOne({ userName });
-    if (existingUser) {
-      return res.status(400).json({ message: "userName already exists" });
+    // Checking if the username already exists
+    const existingUserName = await AuthModel.findOne({ userName });
+    if (existingUserName) {
+      return res.status(400).json({ message: "Username already exists" });
     }
 
-    // pfp decider
-    // const boyPfp = `https://avatar.iran.liara.run/public/boy?username=${userName}`;
-    // const girlPfp = `https://avatar.iran.liara.run/public/girl?username=${userName}`;
-    const apiUrl = `https://ui-avatars.com/api/?name=${firstName}+${lastName}&rounded=true`;
+    // Checking if the email already exists
+    const existingEmail = await AuthModel.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
 
-    // creating user
+    // Profile picture decision
+    const pfpUrl = profilePicture
+      ? profilePicture
+      : `https://ui-avatars.com/api/?name=${firstName}+${lastName}&rounded=true`;
+
+    // Creating user
     const user = new AuthModel({
       firstName,
       lastName,
@@ -44,28 +50,28 @@ const signup = async (req, res, next) => {
       email,
       password,
       cpassword,
-      // profilePicture: gender === "female" ? girlPfp : boyPfp,
-      profilePicture: apiUrl
+      profilePicture: pfpUrl,
     });
 
     if (user) {
-      // generating token
+      // Generating token
       await genJWT(user, res);
 
+      // Saving user to the database
       await user.save();
 
-      // returning success message
+      // Returning success message
       return res.status(201).json({
-        message: "user created successfully",
-        user
+        message: "User created successfully",
+        user,
       });
     } else {
       return res.status(400).json({ message: "Failed to create user" });
     }
   } catch (err) {
-    console.error(`server error while signup: ${err} `);
+    console.error(`Server error during signup: ${err}`);
     const error = {
-      errorDetails: "Internal Server Error While signup",
+      errorDetails: "Internal Server Error During Signup",
     };
     next(error);
   }

@@ -16,11 +16,11 @@ const ConfirmDeleteModal = ({
           Cancel
         </Button>
         <Button variant="danger" onClick={() => handleConfirm(friendId)}>
-          Delete
+          {"Unfriend"}
         </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default ConfirmDeleteModal;
+export default React.memo(ConfirmDeleteModal);

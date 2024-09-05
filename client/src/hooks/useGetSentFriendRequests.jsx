@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { useAuth } from "../context/AuthContext";
+import useStore from "../stores/useStore";
 
 export const useGetSentFriendRequests = () => {
-  const { setToSentRequestIds } = useAuth();
+  const { setToSentRequestIds } = useStore((state) => ({
+    setToSentRequestIds: state.setToSentRequestIds,
+  }));
   useEffect(() => {
     const getSentRequests = async () => {
       try {
@@ -21,7 +23,7 @@ export const useGetSentFriendRequests = () => {
         }
         setToSentRequestIds(data.map((request) => request.receiver));
       } catch (error) {
-        toast.error("useGetSentFriendRequests: " + error.message);
+        toast.error(error.message);
       }
     };
 

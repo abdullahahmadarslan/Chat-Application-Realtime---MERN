@@ -1,9 +1,12 @@
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { useAuth } from "../context/AuthContext";
+import useStore from "../stores/useStore";
 
 export const useGetPendingFriendReqs = () => {
-  const { setPendingRequests } = useAuth();
+  const { setPendingRequests } = useStore((state) => ({
+    setPendingRequests: state.setPendingRequests,
+  }));
+
   useEffect(() => {
     const getPendingFriendReqs = async () => {
       try {
@@ -21,9 +24,9 @@ export const useGetPendingFriendReqs = () => {
           throw new Error(data.message);
         }
         setPendingRequests(data);
-        console.log(data);
+        // console.log(data);
       } catch (error) {
-        toast.error("useGetPendingFriendReqs: " + error.message);
+        toast.error(error.message);
       }
     };
 

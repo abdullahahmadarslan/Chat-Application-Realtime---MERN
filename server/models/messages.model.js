@@ -27,11 +27,16 @@ const MsgSchema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false,
-    },
+    }, // For sender's deletion
+    isDeletedByReceiver: { type: Boolean, default: false }, // For receiver's deletion
     type: {
       type: String,
-      enum: ["text", "image", "video", "audio"],
+      enum: ["text", "image", "video", "audio", "file"],
       required: true,
+    },
+    isSafe: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

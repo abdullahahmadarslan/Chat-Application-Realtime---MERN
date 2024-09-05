@@ -1,10 +1,14 @@
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import useStore from "../stores/useStore";
 
 export const useGetGroupMembers = () => {
   const [loading, setLoading] = useState(false);
-  const { selectedGroup, setCurrentGroupMembers } = useAuth();
+  const { selectedGroup, setCurrentGroupMembers } = useStore((state) => ({
+    selectedGroup: state.selectedGroup,
+    setCurrentGroupMembers: state.setCurrentGroupMembers,
+    currentGroupMembers: state.currentGroupMembers,
+  }));
 
   useEffect(() => {
     const getGroupsMembers = async () => {
@@ -27,7 +31,7 @@ export const useGetGroupMembers = () => {
         // console.log(selectedGroup);
         setCurrentGroupMembers(data);
       } catch (error) {
-        toast.error("useGetGroupMembers" + error.message);
+        toast.error(error.message);
       } finally {
         setLoading(false);
       }

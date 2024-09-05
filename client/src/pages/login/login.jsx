@@ -1,92 +1,72 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
+import { useLogin } from "../../hooks/useLogin"; // Adjust the import path as necessary
 import { NavLink } from "react-router-dom";
-import { MdOutlineLogin } from "react-icons/md";
-import { useLogin } from "../../hooks/useLogin";
 
-const LoginPage = () => {
+function LoginForm() {
   const { loading, login } = useLogin();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
 
-  const handleChange = (event) => {
+  const handleChange = useCallback((event) => {
     const name = event.target.name;
     const value = event.target.value;
 
-    setLoginData({
-      ...loginData,
+    setLoginData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
-  };
+    }));
+  }, []);
 
-  const handleSubmit = async (event) => {
-    try {
-      event.preventDefault();
-      await login(loginData.email, loginData.password);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  const handleSubmit = useCallback(
+    async (event) => {
+      try {
+        event.preventDefault();
+        await login(loginData.email, loginData.password);
+      } catch (error) {
+        console.log(error.message);
+      }
+    },
+    [login, loginData.email, loginData.password]
+  );
 
   return (
-    <div className="d-flex vh-100 vw-100  justify-content-center align-items-center">
-      <div className="col-md-4 col-lg-3 p-5 shadow bg-body h-55 rounded-4 ">
-        <h2 className="text-center mb-4 border-bottom border-dark p-2 ">
-          Login
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group mb-3">
-            <label>Email Address</label>
-            <input
-              type="email"
-              name="email"
-              className="form-control"
-              placeholder="Enter Email Here..."
-              value={loginData.email}
-              onChange={handleChange}
-              style={{ height: "55px" }}
-              autoComplete="off"
-            />
-          </div>
-
-          <div className="form-group mb-5">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              className="form-control"
-              placeholder="Enter Password Here..."
-              value={loginData.password}
-              onChange={handleChange}
-              style={{ height: "55px" }}
-              autoComplete="off"
-            />
-          </div>
-          <button
-            type="submit"
-            className="btn btn-light btn-block"
-            disabled={loading}
-          >
-            {!loading ? (
-              <MdOutlineLogin style={{ fontSize: "30px", width: "50px" }} />
-            ) : (
-              <div
-                className="spinner-border text-muted"
-                style={{ fontSize: "30px" }}
-              ></div>
-            )}
-          </button>
-        </form>
-        <div className="mt-4 text-center">
-          <span>Don't have an account yet?</span>
-          <NavLink
-            to="/signup"
-            className="text-decoration-none custom-margin-left"
-          >
-            Sign Up
-          </NavLink>
-        </div>
+    <form className="login-form" onSubmit={handleSubmit}>
+      <div className="login-title">
+        Welcome,
+        <br />
+        <span>login to continue</span>
       </div>
-    </div>
+      <input
+        className="login-input"
+        name="email"
+        placeholder="Email"
+        type="email"
+        value={loginData.email}
+        onChange={handleChange}
+        autoComplete="off"
+      />
+      <input
+        className="login-input"
+        name="password"
+        placeholder="Password"
+        type="password"
+        value={loginData.password}
+        onChange={handleChange}
+        autoComplete="off"
+      />
+      <button type="submit" className="login-button-confirm" disabled={loading}>
+        {!loading ? "Let`s go →" : "Loading..."}
+      </button>
+      <div className="login-footer text-center mt-2">
+        <span>Don't have an account yet?</span>
+        <NavLink
+          to="/signup"
+          className="text-decoration-none custom-margin-left ms-2"
+        >
+          Sign Up
+        </NavLink>
+      </div>
+    </form>
   );
-};
+}
 
-export default LoginPage;
+export default React.memo(LoginForm);

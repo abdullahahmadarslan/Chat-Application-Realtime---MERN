@@ -1,12 +1,14 @@
 import { toast } from "react-toastify";
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useCallback, useState } from "react";
+import useStore from "../stores/useStore";
 
 export const useGetGroups = () => {
   const [loading, setLoading] = useState(false);
-  const { setGroupsArray } = useAuth();
+  const { setGroupsArray } = useStore((state) => ({
+    setGroupsArray: state.setGroupsArray,
+  }));
 
-  const getGroups = async () => {
+  const getGroups = useCallback(async () => {
     setLoading(true);
     try {
       const serverResponse = await fetch("http://localhost:5000/groups/", {
@@ -22,11 +24,11 @@ export const useGetGroups = () => {
       //   console.log(data);
       setGroupsArray(data);
     } catch (error) {
-      toast.error("useGetGroups" + error.message);
+      console.error(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [setGroupsArray]);
 
   return { loading, getGroups };
 };

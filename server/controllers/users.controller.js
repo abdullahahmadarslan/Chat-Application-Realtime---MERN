@@ -47,9 +47,9 @@ const getFriends = async (req, res, next) => {
       return res.status(404).json({ message: "No friends found" });
     return res.status(200).json(user.friends); //returning an array of objects
   } catch (err) {
-    console.error(`Server error while editing the user: ${err}`);
+    console.error(`Server error while getting the friends: ${err}`);
     const error = {
-      errorDetails: "Internal Server Error While editing the user",
+      errorDetails: "Internal Server Error While getting the friends",
     };
     next(error);
   }

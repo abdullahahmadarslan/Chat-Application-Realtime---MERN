@@ -46,4 +46,4 @@ const MessageSkeleton = () => {
   );
 };
 
-export default MessageSkeleton;
+export default React.memo(MessageSkeleton);

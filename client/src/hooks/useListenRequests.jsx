@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
 import { useSocketContext } from "../context/SocketContext";
+import useStore from "../stores/useStore";
 
 export const useListenRequests = () => {
   const { socket } = useSocketContext();
@@ -11,7 +11,14 @@ export const useListenRequests = () => {
     setPendingRequests,
     setGroupsArray,
     setSelectedContact,
-  } = useAuth();
+  } = useStore((state) => ({
+    setToSentRequestIds: state.setToSentRequestIds,
+    setAllUsers: state.setAllUsers,
+    setContactsArray: state.setContactsArray,
+    setPendingRequests: state.setPendingRequests,
+    setGroupsArray: state.setGroupsArray,
+    setSelectedContact: state.setSelectedContact,
+  }));
 
   useEffect(() => {
     if (!socket) return;
@@ -41,6 +48,11 @@ export const useListenRequests = () => {
       setPendingRequests((prev) =>
         prev.filter((req) => req.sender._id !== sender._id)
       );
+      setAllUsers((prev) => {
+        return prev.filter(
+          (user) => user._id.toString() !== sender._id.toString()
+        );
+      });
     };
     const handleCancelFriendRequest = (senderId) => {
       setPendingRequests((prev) =>
@@ -128,7 +140,6 @@ export const useListenRequests = () => {
       );
       socket.off("groupCreated", handleGroupCreated);
       socket.off("SenderFriendRemoved", handleSenderFriendRemoved);
-      socket.off("ReceiverFriendRemoved", handleSenderFriendRemoved);
       socket.off("ReceiverFriendRemoved", handleReceiverFriendRemoved);
     };
     // eslint-disable-next-line

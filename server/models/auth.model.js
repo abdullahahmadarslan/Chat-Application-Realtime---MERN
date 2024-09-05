@@ -40,7 +40,9 @@ const authSchema = new Schema(
       type: String,
       required: true,
     },
-    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "Auth" }],
+    friends: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Auth", default: [] },
+    ],
   },
   { timestamps: true }
 );

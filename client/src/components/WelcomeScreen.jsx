@@ -39,7 +39,7 @@ const WelcomeScreen = () => {
           Welcome, {user.firstName} {user.lastName}!
         </h1>
         <p className="lead" style={{ color: "#555" }}>
-          We are excited to have you here. Let’s start chatting!
+          We are excited to have you here at SafeChat. Let’s start chatting!
         </p>
       </div>
       <UserEditButton />
@@ -47,4 +47,4 @@ const WelcomeScreen = () => {
   );
 };
 
-export default WelcomeScreen;
+export default React.memo(WelcomeScreen);
